@@ -101,6 +101,11 @@ build_apk() {
 		-c \
 		-o $output_apk_name \
 		-b $patches_filename \
+		-e hide-cast-button \
+		-e custom-branding \
+		-e enable-debugging \
+		-e always-autorepeat \
+		-e disable-fullscreen-panels \
 		-m $integrations_filename"
     if [ "$1" ] && [ ! "$additional_args" = "" ]; then
         # with $additional_args and required arg
