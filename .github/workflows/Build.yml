@@ -26,7 +26,7 @@ jobs:
          run: |
           curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/revanced-creator.keystore
           export additional_args="--keystore=revanced-creator.keystore"
-          sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
+          sh -c "$(curl https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/patch.sh)"
           curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/vanced-microg.apk
 
        - name: Upload Build Artifact(youtube)
@@ -36,40 +36,3 @@ jobs:
            path: |
             revanced-*-non-root.apk
             vanced-microg.apk
-
-       - name: Build youtube-music variant
-         run: |
-          curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/revanced-creator-music.keystore
-          export additional_args="--keystore=revanced-creator-music.keystore"
-          export what_to_patch="youtube-music"
-          sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
-
-       - name: Upload Build Artifact(YouTube-Music)
-         uses: actions/upload-artifact@v3
-         with:
-           name: revanced-music
-           path: revanced-music-*-non-root.apk
-
-       - name: Build reddit variant
-         run: |
-          curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/revanced-creator-reddit.keystore
-          export additional_args="--keystore=revanced-creator-reddit.keystore"
-          export what_to_patch="reddit"
-          sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
-
-       - name: Upload Build Artifact(Reddit)
-         uses: actions/upload-artifact@v3
-         with:
-           name: revanced-reddit
-           path: revanced-reddit-*-non-root.apk
-
-       - name: Build twitter variant
-         run: |
-          export what_to_patch="twitter"
-          sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
-
-       - name: Upload Build Artifact(Twitter)
-         uses: actions/upload-artifact@v3
-         with:
-           name: revanced-twitter
-           path: revanced-twitter-*-non-root.apk
