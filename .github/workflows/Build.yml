@@ -29,7 +29,7 @@ jobs:
        - name: Build youtube variant
          run: |
           curl -OL https://github.com/mifos/head/blob/master/android-client-tests/android-test-key.keystore?raw=true
-          export additional_args="--keystore=android-test-key.keystore -e custom-branding -e always-autorepeat -e disable-fullscreen-panels"
+          export additional_args="-e custom-branding -e always-autorepeat -e disable-fullscreen-panels"
           sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
           curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/vanced-microg.apk
 
