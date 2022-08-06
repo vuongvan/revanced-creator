@@ -1,6 +1,7 @@
 #!/bin/sh
 printf "Resign Apk\n"
-reapk=$(find . -name "revanced-*-non-root.apk")
+reapk="revanced-17.29.34-non-root.apk"
+#reapk=$(find . -name "revanced-*-non-root.apk")
 #printf "$reapk\n"
 #reapk=${reapk:2}
 #printf "$reapk\n"
