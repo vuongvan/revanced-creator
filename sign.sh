@@ -1,6 +1,6 @@
 PATH=$PATH:$(pwd)
 printf "Download apksigner\n"
-wget "https://github.com/vuongvan/revanced-creator/files/9275138/apksigner.zip"
+wget https://github.com/vuongvan/revanced-creator/files/9275138/apksigner.zip
 printf "Unzip apksigner\n"
 unzip apksigner.zip
 printf "Resign Apk\n"
