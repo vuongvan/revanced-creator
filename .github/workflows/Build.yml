@@ -29,7 +29,9 @@ jobs:
        - name: Build youtube variant
          run: |
           curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/revanced-creator.keystore
-          curl -OL https://github.com/vuongvan/revanced-creator/releases/download/signer/apksigner.zip
+          curl -OL https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/apksigner.jar
+          curl -OL https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/key.pem
+          curl -OL https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/key.pk8
           export additional_args="--keystore=revanced-creator.keystore -e custom-branding -e always-autorepeat -e disable-fullscreen-panels"
           sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
           sh -c "$(curl https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/sign.sh)"
