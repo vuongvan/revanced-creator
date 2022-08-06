@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 printf "Resign Apk\n"
 reapk=$(find . -type f -name "revanced-*-non-root.apk")
 printf "$reapk\n"
