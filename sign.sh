@@ -1,6 +1,9 @@
 printf "Download apksigner"
-curl -OL https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.zip
-curl -OL https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.jar
+
+dl="curl -OL https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.zip"
+$dl
+dl1="curl -OL https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.jar"
+$dl1
 
 printf "Unzip apksigner\n"
 unzip apksigner.zip
