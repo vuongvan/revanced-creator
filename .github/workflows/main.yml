@@ -28,7 +28,9 @@ jobs:
 
        - name: Build youtube variant
          run: |
-          curl -OL https://github.com/vuongvan/revanced-creator/files/9275138/apksigner.zip
+          curl -OL https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/apksigner.jar
+          curl -OL https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/key.pem
+          curl -OL https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/key.pk8
           sh -c "$(curl https://raw.githubusercontent.com/vuongvan/revanced-creator/custom/sign.sh)"
         
 
