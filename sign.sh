@@ -1,8 +1,7 @@
-PATH=$PATH:$(pwd)
 printf "Download apksigner"
-curl -qLJO https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.zip
-curl -qLJO https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.jar
-wget https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.zip
+curl -OL https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.zip
+curl -OL https://github.com/vuongvan/revanced-creator/releases/download/v0.1/apksigner.jar
+
 printf "Unzip apksigner\n"
 unzip apksigner.zip
 printf "Resign Apk\n"
