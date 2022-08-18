@@ -161,7 +161,7 @@ main() {
 
     ## what should we patch
     if [ "$what_to_patch" = "youtube" ]; then
-        [ -z "$apk_version" ] && apk_version=17.29.34
+        [ -z "$apk_version" ] && apk_version=17.32.35
         apk_filename=YouTube-$apk_version.apk
         output_apk_name=revanced-$apk_version-$root_text.apk
     elif [ "$what_to_patch" = "youtube-music" ]; then
@@ -179,7 +179,7 @@ main() {
     fi
 
     ## link to download $what_to_patch
-    apk_link=https://github.com/XDream8/revanced-creator/releases/download/v0.1/$apk_filename
+    apk_link=https://github.com/vuongvan/revanced-creator/releases/download/v0.1/$apk_filename
 
     ## downloader
     if [ -z "$downloader" ] && [ "$(command -v curl)" ]; then
