@@ -30,12 +30,17 @@ checkadb() {
 			sudo=rdo
 		elif [ "$(command -v doas)" ]; then
 			sudo=doas
-		else
+		elif [ "$(command -v sudo)" ]; then
 			sudo=sudo
+		else
+			sudo=
 		fi
 
 		printf '%b\n' "${YELLOW}starting adb server${NC}"
-		$sudo adb start-server
+		$sudo adb start-server || {
+			printf '%b\n' "${RED}starting adb server failed, exiting!${NC}"
+			exit 1
+		}
 	fi
 
 	device_id=$(adb devices | awk 'FNR == 2 {print $1}')
@@ -58,23 +63,18 @@ get_latest_version_info() {
 	printf '%b\n' "${BLUE}getting latest versions info${NC}"
 	revanced_cli_version=$(curl -s -L https://github.com/revanced/revanced-cli/releases/latest | awk 'match($0, /([0-9][.]+).*.jar/) {print substr($0, RSTART, RLENGTH)}' | head -n 1 | cut -d"/" -f1)
 	revanced_patches_version=$(curl -s -L https://github.com/revanced/revanced-patches/releases/latest | awk 'match($0, /([0-9][.]+).*.jar/) {print substr($0, RSTART, RLENGTH)}' | head -n 1 | cut -d"/" -f1)
-	revanced_integrations_version=$(curl -s -L https://github.com/revanced/revanced-integrations/releases/latest | grep -o 'revanced/revanced-integrations/releases/download/v[0-9].*/.*.apk' | grep -o "[0-9].*" | cut -d"/" -f1)
-	for i in \
-		"revanced_cli_version=$revanced_cli_version" \
-		"revanced_patches_version=$revanced_patches_version" \
-		"revanced_integrations_version=$revanced_integrations_version"; do
-		printf '%b\n' "${YELLOW}$i${NC}"
-	done
+	# integrations
+	if [ "$what_to_patch" = "youtube" ]; then
+		revanced_integrations_version=$(curl -s -L https://github.com/revanced/revanced-integrations/releases/latest | grep -o 'revanced/revanced-integrations/releases/download/v[0-9].*/.*.apk' | grep -o "[0-9].*" | cut -d"/" -f1)
+	fi
+	# give info
+	printf '%b\n' "${YELLOW}revanced_cli_version : $revanced_cli_version${NC}"
+	printf '%b\n' "${YELLOW}revanced_patches_version : $revanced_patches_version${NC}"
+	[ "$revanced_integrations_version" ] && printf '%b\n' "${YELLOW}revanced_integrations_version : $revanced_integrations_version${NC}"
 }
 
 remove_old() {
-	if [ ! "$(command -v find)" ]; then
-		[ ! -f "$cli_filename" ] && [ -f "revanced-cli-*-all.jar" ] && (printf '%b\n' "${RED}removing old revanced-cli${NC}" && rm -f revanced-cli-*.jar)
-		[ ! -f "$patches_filename" ] && [ -f "revanced-patches-*-all.jar" ] && (printf '%b\n' "${RED}removing old revanced-patches${NC}" && rm -f revanced-patches-*.jar)
-		[ ! -f "$apk_filename" ] && [ -f "YouTube-*.apk" ] && (printf '%b\n' "${RED}removing old youtube${NC}" && rm YouTube-17*.apk)
-		[ ! -f "$apk_filename" ] && [ -f "YouTube-Music-*.apk" ] && (printf '%b\n' "${RED}removing old youtube-music${NC}" && rm YouTube-Music-*.apk)
-		rm -f $integrations_filename
-	else
+	if [ "$(command -v find)" ]; then
 		find . -maxdepth 1 -type f \( -name "revanced-*.jar" -or -name "$integrations_filename" \) ! \( -name "*.keystore" -or -name "$cli_filename" -or -name "$patches_filename" -or -name "$apk_filename" \) -delete
 	fi
 }
@@ -83,11 +83,11 @@ download_needed() {
 	# number
 	n=0
 
-	printf '%b\n' "${BLUE}Downloading revanced-cli, revanced-patches and revanced-integrations${NC}"
+	printf '%b\n' "${BLUE}Downloading needed files${NC}"
 	for i in \
-		https://github.com/revanced/revanced-cli/releases/download/v$revanced_cli_version/$cli_filename \
-		https://github.com/revanced/revanced-patches/releases/download/v$revanced_patches_version/$patches_filename \
-		https://github.com/revanced/revanced-integrations/releases/download/v$revanced_integrations_version/$integrations_filename \
+		$cli_link \
+		$patches_link \
+		$integrations_link \
 		$apk_link; do
 		n=$(($n + 1))
 		printf '%b\n' "${CYAN}$n) ${YELLOW}downloading $i${NC}"
@@ -99,9 +99,8 @@ build_apk() {
 	base_cmd="java -jar $cli_filename \
 		-a $apk_filename \
 		-c \
-		-o $output_apk_name \
-		-b $patches_filename \
-		-m $integrations_filename"
+		-o $output_apk \
+		-b $patches_filename"
 	if [ "$1" ] && [ ! "$additional_args" = "" ]; then
 		# with $additional_args and required arg
 		$base_cmd \
@@ -124,11 +123,23 @@ build_apk() {
 patch() {
 	printf '%b\n' "${BLUE}patching process started(${RED}$root_text${BLUE})${NC}"
 	printf '%b\n' "${BLUE}it may take a while please be patient${NC}"
-	if [ $nonroot = 1 ] && [ "$what_to_patch" = "reddit" ]; then
+	if [ $root = 0 ] && [ "$what_to_patch" = "youtube" ]; then
+		youtube_arg="-m $integrations_filename"
+		build_apk "$youtube_arg"
+	elif [ $root = 0 ] && [ "$what_to_patch" = "reddit" ]; then
 		reddit_arg="-r"
 		build_apk "$reddit_arg"
-	elif [ $nonroot = 1 ]; then
+	elif [ $root = 0 ] && [ "$what_to_patch" = "tiktok" ]; then
+		tiktok_arg="-r"
+		build_apk "$tiktok_arg"
+	elif [ $root = 0 ]; then
 		build_apk
+	elif [ $root = 1 ] && [ "$what_to_patch" = "youtube" ]; then
+		root_args="-d $device_id \
+			    -m $integrations_filename \
+          -e microg-support \
+          --mount"
+		build_apk "$root_args"
 	else
 		root_args="-d $device_id \
           -e microg-support \
@@ -141,11 +152,11 @@ main() {
 
 	## defaults
 	[ -z "$what_to_patch" ] && what_to_patch="youtube"
-	[ -z "$nonroot" ] && nonroot=1
+	[ -z "$root" ] && root=0
 	[ -z "$additional_args" ] && additional_args=""
 
-	## check $nonroot
-	if [ $nonroot = 1 ]; then
+	## check $root
+	if [ $root = 0 ]; then
 		root_text="non-root"
 	else
 		root_text="root"
@@ -158,19 +169,23 @@ main() {
 	if [ "$what_to_patch" = "youtube" ]; then
 		[ -z "$apk_version" ] && apk_version=17.32.35
 		apk_filename=YouTube-$apk_version.apk
-		output_apk_name=revanced-$apk_version-$root_text.apk
+		[ -z "$output_apk" ] && output_apk=revanced-$apk_version-$root_text.apk
 	elif [ "$what_to_patch" = "youtube-music" ]; then
 		[ -z "$apk_version" ] && apk_version=5.17.51
 		apk_filename=YouTube-Music-$apk_version.apk
-		output_apk_name=revanced-music-$apk_version-$root_text.apk
+		[ -z "$output_apk" ] && output_apk=revanced-music-$apk_version-$root_text.apk
 	elif [ "$what_to_patch" = "twitter" ]; then
 		[ -z "$apk_version" ] && apk_version=9.53.0
 		apk_filename=Twitter-$apk_version.apk
-		output_apk_name=revanced-twitter-$apk_version-$root_text.apk
+		[ -z "$output_apk" ] && output_apk=revanced-twitter-$apk_version-$root_text.apk
 	elif [ "$what_to_patch" = "reddit" ]; then
 		[ -z "$apk_version" ] && apk_version=2022.28.0
 		apk_filename=Reddit-$apk_version.apk
-		output_apk_name=revanced-reddit-$apk_version-$root_text.apk
+		[ -z "$output_apk" ] && output_apk=revanced-reddit-$apk_version-$root_text.apk
+	elif [ "$what_to_patch" = "tiktok" ]; then
+		[ -z "$apk_version" ] && apk_version=25.8.2
+		apk_filename=TikTok-$apk_version.apk
+		[ -z "$output_apk" ] && output_apk=revanced-tiktok-$apk_version-$root_text.apk
 	elif [ "$what_to_patch" = "custom" ]; then
 		if [ -z "$apk_filename" ] && [ "$(command -v find)" ]; then
 			apk_filename=$(find . -maxdepth 1 -type f \( -name "*.apk" \) ! \( -name "app-release-unsigned.apk" -or -name "revanced-*.apk" \) | sort -R | head -n 1 | sed 's/.\///')
@@ -187,7 +202,7 @@ main() {
 			printf '%b\n' "${RED}apk file does not exist, please specify an existing apk file using 'apk_filename' arg${NC}"
 			exit 1
 		fi
-		[ -z "$output_apk_name" ] && output_apk_name=revanced-$apk_filename
+		[ -z "$output_apk" ] && output_apk=revanced-$apk_filename
 	fi
 
 	## link to download $what_to_patch
@@ -221,20 +236,32 @@ main() {
 	get_latest_version_info
 
 	if [ ! "$what_to_patch" = "custom" ]; then
-		printf '%b\n' "${YELLOW}$what_to_patch version to be patched: $apk_version${NC}"
+		printf '%b\n' "${YELLOW}$what_to_patch version to be patched : $apk_version${NC}"
 	else
-		printf '%b\n' "${YELLOW}custom apk: $apk_filename${NC}"
+		printf '%b\n' "${YELLOW}custom apk : $apk_filename${NC}"
 	fi
+
+	##
 	cli_filename=revanced-cli-$revanced_cli_version-all.jar
 	patches_filename=revanced-patches-$revanced_patches_version.jar
 	integrations_filename=app-release-unsigned.apk
 
 	remove_old
+
+	[ ! -f "$cli_filename" ] && cli_link=https://github.com/revanced/revanced-cli/releases/download/v$revanced_cli_version/$cli_filename
+	[ ! -f "$patches_filename" ] && patches_link=https://github.com/revanced/revanced-patches/releases/download/v$revanced_patches_version/$patches_filename
+	if [ "$what_to_patch" = "youtube" ]; then
+		[ ! -f "$integrations_filename" ] && integrations_link=https://github.com/revanced/revanced-integrations/releases/download/v$revanced_integrations_version/$integrations_filename
+	fi
+
 	download_needed
 
-	if [ $nonroot = 0 ]; then
+	if [ $root = 1 ]; then
 		printf '%b\n' "${BLUE}root variant: installing stock youtube-$apk_version first${NC}"
-		adb install -r $apk_filename || (printf '%b\n' "${RED}install failed, exiting!${NC}" && exit 1 && exit 1)
+		adb install -r $apk_filename || {
+			printf '%b\n' "${RED}install failed, exiting!${NC}"
+			exit 1
+		}
 		checkyt
 	fi
 

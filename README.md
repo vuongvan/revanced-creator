@@ -1,6 +1,10 @@
 # revanced-creator [![CI](https://github.com/XDream8/revanced-creator/actions/workflows/Build.yml/badge.svg)](https://github.com/XDream8/revanced-creator/actions/workflows/Build.yml)
-this script first downloads the latest [revanced-cli](https://github.com/revanced/revanced-cli), [revanced-patches](https://github.com/revanced/revanced-patches) and [revanced-integrations](https://github.com/revanced/revanced-integrations). then it downloads the latest supported youtube version and patches it according to [revanced-documentation](https://github.com/revanced/revanced-documentation) \
-Now we even support patching YouTube-Music, Reddit and Twitter \
+**What does this do?**
+
+1. downloading the latest [revanced-cli](https://github.com/revanced/revanced-cli), [revanced-patches](https://github.com/revanced/revanced-patches) and [revanced-integrations](https://github.com/revanced/revanced-integrations).
+2. downloading the latest supported youtube(yt-music, reddit, twitter, tiktok) version
+3. creating revanced app according to [revanced-documentation](https://github.com/revanced/revanced-documentation)
+
 **Check out [github actions](https://github.com/XDream8/revanced-creator/actions) (they are all built using this script. also non-root variant there includes vanced-microg.apk inside it)**
 ## deps
 - sh(dash or bash)
@@ -30,7 +34,7 @@ here is how to patch user downloaded reddit apk \
 ```sh
 $ export what_to_patch="custom"
 $ export apk_filename=reddit.apk
-$ export output_apk_name=revanced-reddit.apk
+$ export output_apk=revanced-reddit.apk
 $ export additional_args="-r"
 $ ./patch.sh
 ```
@@ -45,19 +49,26 @@ $ ./patch.sh
 $ export what_to_patch="youtube-music"
 $ ./patch.sh
 ```
+#### output_apk
+you can set output apk name with this
+```
+$ export output_apk="ReReddit.apk"
+$ ./patch.sh
+```
 #### apk_version(defaults to latest)
 **Versions Available** \
 YouTube: 17.26.35, 17.27.39, 17.28.34, 17.29.34, 17.32.35 \
 YouTube-Music: 5.14.53, 5.16.51, 5.17.51 \
 Twitter: 9.52.0, 9.53.0 \
-Reddit: 2022.28.0
+Reddit: 2022.28.0 \
+TikTok: 25.8.2
 ```sh
 $ export apk_version=17.27.39
 $ ./patch.sh
 ```
-#### nonroot(defaults to 1)
+#### root(defaults to 0)
 ```sh
-$ export nonroot=1
+$ export root=0
 $ ./patch.sh
 ```
 #### downloader
@@ -67,7 +78,7 @@ $ ./patch.sh
 ```
 #### or you can use all these options together
 ```sh
-$ export nonroot=1
+$ export root=0
 $ export downloader="axel -n 16"
 $ export additional_args="-i enable-wide-searchbar -i swipe-controls -e hide-shorts-button"
 $ export what_to_patch="youtube"
