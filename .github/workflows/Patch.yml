@@ -34,6 +34,9 @@ jobs:
           sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
           curl -OL https://github.com/XDream8/revanced-creator/releases/download/v0.1/vanced-microg.apk
 
+       - name: Set current date as env variable
+        run: echo "date_now=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
        - name: Upload Build Artifact(youtube)
          uses: actions/upload-artifact@v3
          with:
@@ -44,7 +47,7 @@ jobs:
        - name: Upload Build Artifact(microg)
          uses: actions/upload-artifact@v3
          with:
-           name: vanced-microg
+           name: "Release ${{ env.date_now }}
            path: |
             vanced-microg.apk
          
