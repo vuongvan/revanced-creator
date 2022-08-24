@@ -47,7 +47,7 @@ jobs:
        - name: Upload Build Artifact(microg)
          uses: actions/upload-artifact@v3
          with:
-           name: "Release ${{ env.date_now }}
+           name: "Release ${{ env.date_now }}" 
            path: |
             vanced-microg.apk
          
