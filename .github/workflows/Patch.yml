@@ -40,14 +40,14 @@ jobs:
        - name: Upload Build Artifact(youtube)
          uses: actions/upload-artifact@v3
          with:
-           name: revanced-youtube
+           name: "revanced ${{ env.date_now }}"  
            path: |
             revanced-*-non-root.apk
          
        - name: Upload Build Artifact(microg)
          uses: actions/upload-artifact@v3
          with:
-           name: "Release ${{ env.date_now }}" 
+           name: vanced-microg
            path: |
             vanced-microg.apk
          
