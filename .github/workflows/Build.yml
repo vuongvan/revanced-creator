@@ -29,7 +29,7 @@ jobs:
        - name: Build youtube variant
          run: |
           # curl -OL https://github.com/XDream8/revanced-creator/releases/download/keystores/revanced-creator.keystore
-          # export additional_args="--keystore=revanced-creator.keystore"
+          # export additional_args="--keystore=revanced-creator.keystore -e custom-branding -e always-autorepeat -e swipe-controls -e hide-cast-button -e premium-heading"
           sh -c "$(curl https://raw.githubusercontent.com/XDream8/revanced-creator/main/patch.sh)"
           curl -OL https://github.com/XDream8/revanced-creator/releases/download/youtube/vanced-microg.apk
 
