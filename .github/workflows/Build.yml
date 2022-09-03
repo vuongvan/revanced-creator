@@ -20,11 +20,7 @@ jobs:
            distribution: 'zulu'
            java-version: '17'
 
-       - name: Update the system
-         run: |
-          sudo apt-get update
-          sudo apt-get upgrade
-          sudo apt install curl grep
+       
 
        - name: Build youtube variant
          run: |
